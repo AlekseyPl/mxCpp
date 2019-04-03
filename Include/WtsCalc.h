@@ -21,8 +21,8 @@ public:
 
 
 	void CalculateWts( const DMatrix& RefSigsR, const DMatrix& RefSigsI,
-					   const DVector& SigR, const DVector& SigI, int k);
-	void CalculatePrevStAndCumWts(DVector& NewCumWts, DVector& OldCumWts, IVector& PrevStsCurCol);
+					   const DMatrix& SigR, const DMatrix& SigI, int k, int k1);
+	void CalculatePrevStAndCumWts(const DVector& OldCumWts, DVector& NewCumWts, IVector& PrevStsCurCol);
 
 private:
 
@@ -46,8 +46,8 @@ private:
 	DVector wts;
 
 	void CalculateComplex(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
-						  const DVector& SigR, const DVector& SigI, int k);
-	void CalculateReal(const DMatrix& RefSigsR, const DVector& SigR, int k);
+						  const DMatrix& SigR, const DMatrix& SigI, int k, int k1);
+	void CalculateReal(const DMatrix& RefSigsR, const DMatrix& SigR, int k, int k1);
 };
 
 #endif /* INCLUDE_WTSCALC_H_ */

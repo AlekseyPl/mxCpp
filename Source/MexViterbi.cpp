@@ -135,36 +135,37 @@ void mexFunction( int nlhs, mxArray *plhs[],
 // Продолжение получения значений входных переменных
 
 		SpectrsR.resize(params.NL1*NSymb);
-		auto ptrR = mxGetPr(prhs[Spectrs_idx]);
-		for( int i =0; i < SpectrsR.size(); ++i ) {
-			SpectrsR.resize(params.Nt);
-			for( auto& v : SpectrsR[ i ] ) v = *ptrR++;
+		double* ptrR = mxGetPr(prhs[Spectrs_idx]);
+		for( auto it =SpectrsR.begin(); it != SpectrsR.end(); ++it ) {
+			it->resize(params.Nt);
+			for( auto& v : *it ) v = *ptrR++;
 		}
 
 
 		if (isSigComplex) {	// Мнимая часть
 			SpectrsI.resize(params.NL1*NSymb);
-			auto ptrI = mxGetPi(prhs[Spectrs_idx]);
-			for( int i =0; i < SpectrsI.size(); ++i ) {
-				SpectrsI.resize(params.Nt);
-				for( auto& v : SpectrsI[ i ] ) v = *ptrI++;
+			double* ptrI = mxGetPi(prhs[Spectrs_idx]);
+			for( auto it =SpectrsI.begin(); it != SpectrsI.end(); ++it ) {
+				it->resize(params.Nt);
+				for( auto& v : *it ) v = *ptrI++;
 			}
 		}
 
 		RefSigsR.resize(params.ML2L1);
-		auto ptrRefR = mxGetPr(prhs[RefSigs_idx]);
-		for( int i =0; i < params.ML2L1; ++i ) {
-			RefSigsR.resize(params.Nt);
-			for( auto& v : RefSigsR[ i ] ) v = *ptrRefR++;
+		double* ptrRefR = mxGetPr(prhs[RefSigs_idx]);
+		for( auto it =RefSigsR.begin(); it != RefSigsR.end(); ++it ) {
+			it->resize(params.Nt);
+			for( auto& v : *it ) v = *ptrRefR++;
 		}
 
 		if (isSigComplex) {		// Мнимая часть
 			RefSigsI.resize(params.ML2L1);
 			auto ptrRefI = mxGetPi(prhs[RefSigs_idx]);
-			for( int i =0; i < params.ML2L1; ++i ) {
-				RefSigsI.resize(params.Nt);
-				for( auto& v : RefSigsI[ i ] ) v = *ptrRefI++;
+			for( auto it =RefSigsI.begin(); it != RefSigsI.end(); ++it ) {
+				it->resize(params.Nt);
+				for( auto& v : *it ) v = *ptrRefI++;
 			}
+
 		}
 
 
@@ -188,10 +189,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
 				SpectrsShift += params.NL1; // сдвиг внутри массивов Spectrs и
 				BitNumShift  += params.N*params.log2M; // OutLLR
 		}
-//		memcpy(OutLLR, &vecOut[0], vecOut.size() * sizeof(double));
+		memcpy(OutLLR, &vecOut[0], NNSymb*params.log2M * sizeof(double));
 
-//		for( auto&i : vecOut) 			*OutLLR++ = i;
-//		for( int i = 0;)
         
     return;
 }

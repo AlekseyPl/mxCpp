@@ -49,6 +49,7 @@ void ViterbiDemodulator::process(const DMatrix& RefSigsR,const DMatrix& RefSigsI
 
 	OldCumWts.at(0) = 0;
 
+
 	// Переменная для хранения номера текущего столбца в PrevSts (column number)
 	int32_t PrevStsColNum = TBLen - 2;
 
@@ -73,14 +74,14 @@ void ViterbiDemodulator::process(const DMatrix& RefSigsR,const DMatrix& RefSigsI
 	if( debug ) cout << "First step of processing" << endl;
 	// 1. На первых T-1 ТИ делаются только ВВМП без вынесения решений о
 	// символах
-	for (k = 0, k1 = SigsShift; k < TBLen - 1; k++, k1++) { // k - номер
+	for (k = 0, k1 = SigsShift; k < TBLen - 1; ++k, ++k1) { // k - номер
 															// текущего ТИ
 															// Вычислим веса всех переходов
-		wtsCalc->CalculateWts( RefSigsR, RefSigsI, SigR.at(k1), SigI.at(k1), k );
+		wtsCalc->CalculateWts( RefSigsR, RefSigsI, SigR, SigI, k, k1 );
 		// Определим выжившие пути и метрики этих путей
-		wtsCalc->CalculatePrevStAndCumWts( NewCumWts, OldCumWts, PrevSts.at(k));
+		wtsCalc->CalculatePrevStAndCumWts( OldCumWts, NewCumWts, PrevSts.at(k));
 		// Подготовимся к следующей итерации
-//		swap(OldCumWts, NewCumWts);
+		swap(OldCumWts, NewCumWts);
 	}
 
 
@@ -92,17 +93,16 @@ void ViterbiDemodulator::process(const DMatrix& RefSigsR,const DMatrix& RefSigsI
 	X = ( TBLen <= L ) ? N - 1 : N + L - 1 - TBLen;
 	if( debug ) cout << "X = " << X << " N " << N << " L " << L <<" TB" << TBLen<< endl;
 
-
 	for (k = TBLen - 1, k1 = k + SigsShift; k < TBLen - 1 + X; ++k, ++k1) {
 		// k - номер текущего ТИ
 		// Вычислим веса всех переходов
-		wtsCalc->CalculateWts( RefSigsR, RefSigsI, SigR.at(k1), SigI.at(k1), k );
+		wtsCalc->CalculateWts( RefSigsR, RefSigsI, SigR, SigI, k, k1 );
 
 		// Определим выжившие пути и метрики этих путей
 	 
 		PrevStsColNum = ( PrevStsColNum + 1 ) % TBLen;
 
-		wtsCalc->CalculatePrevStAndCumWts( NewCumWts, OldCumWts, PrevSts.at(PrevStsColNum) );
+		wtsCalc->CalculatePrevStAndCumWts( OldCumWts, NewCumWts,  PrevSts.at(PrevStsColNum) );
 		// Подготовимся к следующей итерации
 		swap(OldCumWts, NewCumWts);
 		// Определение значения очередного символа обратным проходом по
@@ -149,11 +149,11 @@ void ViterbiDemodulator::process(const DMatrix& RefSigsR,const DMatrix& RefSigsI
 
 	// ВВМП на одном ТИ
 	// Вычислим веса всех переходов (k имеет нужное значение!)
-	wtsCalc->CalculateWts( RefSigsR, RefSigsI,  SigR.at(k1), SigI.at(k1), k );
+	wtsCalc->CalculateWts( RefSigsR, RefSigsI, SigR, SigI, k, k1 );
 
 	// Определим выжившие пути и метрики этих путей
 	PrevStsColNum = ( PrevStsColNum + 1 ) % TBLen; 
-	wtsCalc->CalculatePrevStAndCumWts( NewCumWts, OldCumWts, PrevSts.at(PrevStsColNum));
+	wtsCalc->CalculatePrevStAndCumWts( OldCumWts, NewCumWts, PrevSts.at(PrevStsColNum));
 
 	// Вынесение решения об Y символах
 	// Cначала надо сделать Z холостых шагов

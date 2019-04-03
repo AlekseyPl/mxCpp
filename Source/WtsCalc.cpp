@@ -18,7 +18,7 @@ WtsCalc::~WtsCalc()
 // Функция вычисления весов выживших путей и значений предыдущих
 // состояний. Особенность: передаётся указатель не на весь массив
 // PrevSts, а только на текущий столбец PrevStsCurCol
-void WtsCalc::CalculatePrevStAndCumWts( DVector& NewCumWts, DVector& OldCumWts, IVector& PrevStsCurCol)
+void WtsCalc::CalculatePrevStAndCumWts(const DVector& OldCumWts, DVector& NewCumWts, IVector& PrevStsCurCol)
 {
 // Для каждого возможного состояния (CurSt) определим лучший путь
 // приходящий в него. Первые два цикла (по n и по m) нужны для
@@ -40,12 +40,12 @@ void WtsCalc::CalculatePrevStAndCumWts( DVector& NewCumWts, DVector& OldCumWts, 
 			// Цикл по состояниям, из которых можно попасть в текущее
 			for (int p = 0; p < M; ++p) {
 				// Вычислим метрику пути из PrevSt в CurSt
-				Buf = OldCumWts[ PrevSt ] + wts[ RefSigNum ];
+				Buf = OldCumWts.at(PrevSt) + wts.at(RefSigNum);
 				// Если она минимальная, то надо её сохранить
 				if (Buf < Min) {
 					Min = Buf;
-					NewCumWts[ CurSt ] = Buf;
-					PrevStsCurCol[ CurSt ] = PrevSt;
+					NewCumWts.at(CurSt) = Buf;
+					PrevStsCurCol.at(CurSt) = PrevSt;
 				}
 				// Подготовка к следующей итерации
 				++PrevSt;
@@ -58,10 +58,10 @@ void WtsCalc::CalculatePrevStAndCumWts( DVector& NewCumWts, DVector& OldCumWts, 
  
 
 void WtsCalc::CalculateWts(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
-						   const DVector& SigR, const DVector& SigI, int k )
+						   const DMatrix& SigR, const DMatrix& SigI, int k, int k1 )
 {
-	if (type == DataType::real)		CalculateReal(RefSigsR, SigR, k);
-	else		                    CalculateComplex(RefSigsR, RefSigsI, SigR, SigI, k);
+	if (type == DataType::real)		CalculateReal(RefSigsR, SigR, k, k1);
+	else		                    CalculateComplex(RefSigsR, RefSigsI, SigR, SigI, k,k1);
 }
 // Функция вычисления значений весов всех переходов, т.е. расстояний от
 // принятого на текущем тактовом интервале сигнала до опорных сигналов.
@@ -69,7 +69,7 @@ void WtsCalc::CalculateWts(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
 // WtsCalculationRAnyNt и WtsCalculationRNtOne определяется
 // комплексностью сигнала и значением Nt
 void WtsCalc::CalculateComplex(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
-							   const DVector& SigR, const DVector& SigI, int k)
+							   const DMatrix& SigR, const DMatrix& SigI, int k, int k1)
 {
 	// Определим сдвиг в массивах RefSigs
 	if (k > L - 2) 			RefSigShift = ( k < NSyms ) ? L - 1 : L + k - NSyms;
@@ -85,14 +85,14 @@ void WtsCalc::CalculateComplex(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
 
 		BufRefSigShift = RefSigShift + distance(wts.begin(), wtsIt);
 		for (int m = 0; m < Nt; ++m) {
-			auto re = RefSigsR[ BufRefSigShift ][ m ] - SigR[ m ];
-			auto im = RefSigsI[ BufRefSigShift ][ m ] - SigI[ m ];
+			auto re = RefSigsR[ BufRefSigShift ][ m ] - SigR.at(k1).at(m);
+			auto im = RefSigsI[ BufRefSigShift ][ m ] - SigI.at(k1).at(m);
 			*wtsIt += re * re + im * im;
 		}
 	}
 }
 
-void WtsCalc::CalculateReal(const DMatrix& RefSigsR, const DVector& SigR, int k )
+void WtsCalc::CalculateReal(const DMatrix& RefSigsR, const DMatrix& SigR, int k , int k1)
 {
 	// Определим сдвиг в массивах RefSigs
 	if (k > L - 2) 			RefSigShift = ( k < NSyms ) ? L - 1 : L + k - NSyms;
@@ -102,10 +102,11 @@ void WtsCalc::CalculateReal(const DMatrix& RefSigsR, const DVector& SigR, int k 
 	// Для каждого опорного сигнала n вычисляется евклидово расстояние 
 	// до принятого на текущем, т.е. k1-м, тактовом интервале сигнала
 	fill(wts.begin(), wts.end(), 0);
+
 	BufRefSigShift = RefSigShift;
 	for (auto wtsIt = wts.begin(); wtsIt < wts.end(); ++wtsIt) {
 		for (int n = 0; n < Nt; ++n ) {
-			auto re = RefSigsR[ BufRefSigShift ][ n ] - SigR[ n ];
+			auto re = RefSigsR.at(BufRefSigShift).at(n) - SigR.at(k1).at(n);
 			*wtsIt += re * re;
 		}
 		++BufRefSigShift;
