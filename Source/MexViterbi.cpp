@@ -64,11 +64,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
     // Внимание к матричным переменным! При передаче двумерного массива,
     // т.е. матрицы, из Matlab в C++ данные записываются в одномерный
     // массив, причём порядок считывания из матрицы - по столбцам!
-    
-    // Объявления переменных
-	// Входные переменные
-	// целочисленные переменные-скаляры
-		int NSymb;
 
 	// Указатели на вещественную (и мнимую) часть
 		DMatrix SpectrsR;
@@ -77,14 +72,8 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		DMatrix RefSigsI;
 
 
-	// Значение длины памяти демодулятора, т.е. количества тактовых
-	// интервалов сигнала на основании которых получается значение
-	// первого демодулированного символа
-		int TBLen;
-
-// Выходные переменные
+	// Выходные переменные
 		int k, SpectrsShift, BitNumShift;
-
 		SignalParams params;
     // Получение значений входных переменных
 	// Количество компонент
@@ -96,14 +85,13 @@ void mexFunction( int nlhs, mxArray *plhs[],
 	// Кол-во отсчётов сигнала на один ТИ
 		params.Nt = static_cast<int>(mxGetScalar(prhs[Nt_idx]));
 	// Кол-во NOFDM-символов в одном кадре
-		NSymb = static_cast<int>(mxGetScalar(prhs[Nsymb_idx]));
-	// Дисперсия шума - НЕ ИСПОЛЬЗУЕТСЯ!
-	//    Var = (double)(mxGetScalar(prhs[5]));
-	// TBLen
-		TBLen = static_cast<int>(mxGetScalar(prhs[TBLen_idx]));
+		int NSymb = static_cast<int>(mxGetScalar(prhs[Nsymb_idx]));
 
+	// Значение длины памяти демодулятора, т.е. количества тактовых
+	// интервалов сигнала на основании которых получается значение
+	// первого демодулированного символа
+		int TBLen = static_cast<int>(mxGetScalar(prhs[TBLen_idx]));
     // Расчёт часто используемых значений - для упрощения кода    
-         
 		int log2M = 1;
 		k = 2;
 		while (k < params.M) {
@@ -123,16 +111,12 @@ void mexFunction( int nlhs, mxArray *plhs[],
 		params.NL     = params.N + params.L;
 		params.NL1    = params.NL -  1;
 		params.NBits  = params.N * params.log2M;
-	// NNSymb = N * NSymb
 		int32_t NNSymb = params.N * NSymb;
 
-	// Флаг, указывающий на то комплексный сигнал или нет
+		// Флаг, указывающий на то комплексный сигнал или нет
 		bool isSigComplex = mxIsComplex(prhs[Spectrs_idx]);
 		params.type = isSigComplex ? DataType::complex : DataType::real;
 		params.constType = ( params.M > 2 ) ? ConstellationType::m_ary : ConstellationType::binary;
-
-
-// Продолжение получения значений входных переменных
 
 		SpectrsR.resize(params.NL1*NSymb);
 		double* ptrR = mxGetPr(prhs[Spectrs_idx]);
@@ -168,7 +152,6 @@ void mexFunction( int nlhs, mxArray *plhs[],
 
 		}
 
-
     // Выделение памяти под выходную переменную - массив OutLLR. Это
 	// выделение памяти надо делать особой функцией, чтобы MATLAB смог
     // получить результат.
@@ -189,8 +172,9 @@ void mexFunction( int nlhs, mxArray *plhs[],
 				SpectrsShift += params.NL1; // сдвиг внутри массивов Spectrs и
 				BitNumShift  += params.N*params.log2M; // OutLLR
 		}
-		memcpy(OutLLR, &vecOut[0], NNSymb*params.log2M * sizeof(double));
+//		memcpy(OutLLR, &vecOut[0], NNSymb*params.log2M * sizeof(double));
+		for( auto rev = vecOut.rbegin(); rev != vecOut.rend(); ++rev )
+			*OutLLR++= *rev;
 
-        
     return;
 }

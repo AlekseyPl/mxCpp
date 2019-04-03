@@ -53,7 +53,7 @@ struct ValueState {
     unsigned		state;
     double			value;
     ValueState( unsigned st = 0, double val = 0 ):
-    	state( st ), value( val ) { };
+		state( st ), value( val ) { }
 };
 
 #ifdef BCJR

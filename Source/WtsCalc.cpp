@@ -29,7 +29,7 @@ void WtsCalc::CalculatePrevStAndCumWts(const DVector& OldCumWts, DVector& NewCum
 	int PrevSt;
 	int RefSigNum = 0;
 	double Buf = 0;
-	double Min;
+	double Min = MInf;
 	std::fill( NewCumWts.begin(), NewCumWts.end(), MInf );
 	std::fill( PrevStsCurCol.begin(), PrevStsCurCol.end(), -1 );
 

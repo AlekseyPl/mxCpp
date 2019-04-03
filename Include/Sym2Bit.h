@@ -30,4 +30,9 @@ private:
 };
 
 
+
+class BinaryConvert : public Sym2Bit {
+
+};
+
 #endif

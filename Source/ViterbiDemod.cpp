@@ -30,9 +30,10 @@ ViterbiDemodulator::~ViterbiDemodulator()
 void ViterbiDemodulator::process(const DMatrix& RefSigsR,const DMatrix& RefSigsI, const DMatrix& SigR, const DMatrix& SigI,
 	DVector& OutLLR, int SigsShift, int BitNumShift)
 {
-	int k, k1, n, m, p;
+	int k, k1, n, m;
 
-	int CurSt, PrevSt, MaxSt = ML1;
+	int PrevSt;
+	int MaxSt = ML1;
 
 	// ѕеременна€ дл€ хранени€ номера опорного сигнала (reference signal number)
 	int RefSigNum;
