@@ -10,10 +10,6 @@ WtsCalc::WtsCalc( const SignalParams& sp, bool debug ):
 	wts.resize( ML );
 }
 
-WtsCalc::~WtsCalc()
-{
-
-}
 
 // Функция вычисления весов выживших путей и значений предыдущих
 // состояний. Особенность: передаётся указатель не на весь массив
@@ -57,18 +53,13 @@ void WtsCalc::CalculatePrevStAndCumWts(const DVector& OldCumWts, DVector& NewCum
 }
  
 
-void WtsCalc::CalculateWts(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
-						   const DMatrix& SigR, const DMatrix& SigI, int k, int k1 )
-{
-	if (type == DataType::real)		CalculateReal(RefSigsR, SigR, k, k1);
-	else		                    CalculateComplex(RefSigsR, RefSigsI, SigR, SigI, k,k1);
-}
+
 // Функция вычисления значений весов всех переходов, т.е. расстояний от
 // принятого на текущем тактовом интервале сигнала до опорных сигналов.
 // Выбор функции между WtsCalculationCAnyNt, WtsCalculationCNtOne,
 // WtsCalculationRAnyNt и WtsCalculationRNtOne определяется
 // комплексностью сигнала и значением Nt
-void WtsCalc::CalculateComplex(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
+void WtsCalcComplex::CalculateWts(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
 							   const DMatrix& SigR, const DMatrix& SigI, int k, int k1)
 {
 	// Определим сдвиг в массивах RefSigs
@@ -92,7 +83,8 @@ void WtsCalc::CalculateComplex(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
 	}
 }
 
-void WtsCalc::CalculateReal(const DMatrix& RefSigsR, const DMatrix& SigR, int k , int k1)
+void WtsCalcReal::CalculateWts(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
+							   const DMatrix& SigR, const DMatrix& SigI, int k, int k1)
 {
 	// Определим сдвиг в массивах RefSigs
 	if (k > L - 2) 			RefSigShift = ( k < NSyms ) ? L - 1 : L + k - NSyms;

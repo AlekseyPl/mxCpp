@@ -18,7 +18,10 @@ ViterbiDemodulator::ViterbiDemodulator( const SignalParams& sp, int TBLen, bool 
 	PrevSts.resize(TBLen);
 	for (auto &p : PrevSts)     p.resize(sp.ML1);
 
-	wtsCalc = make_shared< WtsCalc >( sp );
+	if( sp.type == DataType::real)		wtsCalc = make_shared<WtsCalcReal>(sp);
+	if( sp.type == DataType::complex)	wtsCalc = make_shared<WtsCalcComplex>(sp);
+
+
 	if( constType == ConstellationType::binary )	 conv = make_shared<BinaryConvertor>(sp);
 	else if( constType == ConstellationType::m_ary ) conv = make_shared<MaryConvertor>(sp);
 }

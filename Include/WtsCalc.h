@@ -16,15 +16,15 @@
 class WtsCalc {
 public:
 
-	WtsCalc( const SignalParams& sp, bool debug = false);
-	~WtsCalc( );
+	WtsCalc(const SignalParams& sp, bool debug = false);
+	virtual ~WtsCalc( ) { }
 
 
-	void CalculateWts( const DMatrix& RefSigsR, const DMatrix& RefSigsI,
-					   const DMatrix& SigR, const DMatrix& SigI, int k, int k1);
+	virtual void CalculateWts( const DMatrix& RefSigsR, const DMatrix& RefSigsI,
+					   const DMatrix& SigR, const DMatrix& SigI, int k, int k1) = 0;
 	void CalculatePrevStAndCumWts(const DVector& OldCumWts, DVector& NewCumWts, IVector& PrevStsCurCol);
 
-private:
+protected:
 
 	DataType type;
 	bool debug;
@@ -41,13 +41,30 @@ private:
 	int BufRefSigShift;
 
 	int NSyms;
-
 	// Объявление вектора весов переходов (Wts - branch // weights) размером ML элементов
 	DVector wts;
+};
 
-	void CalculateComplex(const DMatrix& RefSigsR, const DMatrix& RefSigsI,
-						  const DMatrix& SigR, const DMatrix& SigI, int k, int k1);
-	void CalculateReal(const DMatrix& RefSigsR, const DMatrix& SigR, int k, int k1);
+
+class WtsCalcReal : public WtsCalc {
+public:
+	WtsCalcReal(const SignalParams& sp, bool debug = false):
+		WtsCalc(sp,debug)  {}
+	~WtsCalcReal( )		   {}
+
+	void CalculateWts( const DMatrix& RefSigsR, const DMatrix& RefSigsI,
+					   const DMatrix& SigR, const DMatrix& SigI, int k, int k1);
+};
+
+
+class WtsCalcComplex: public WtsCalc {
+public:
+	WtsCalcComplex(const SignalParams& sp, bool debug = false):
+		WtsCalc(sp,debug)	{}
+	~WtsCalcComplex( )		{}
+
+	void CalculateWts( const DMatrix& RefSigsR, const DMatrix& RefSigsI,
+					   const DMatrix& SigR, const DMatrix& SigI, int k, int k1);
 };
 
 #endif /* INCLUDE_WTSCALC_H_ */
