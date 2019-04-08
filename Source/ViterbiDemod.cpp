@@ -45,7 +45,6 @@ void ViterbiDemodulator::process(const DMatrix& RefSigsR,const DMatrix& RefSigsI
 
 	// Инициализация значений NewCumWts и OldCumWts
 	fill(OldCumWts.begin(), OldCumWts.end(), MInf);
-
 	fill(NewCumWts.begin(), NewCumWts.end(), 0);
 
 	OldCumWts.at(0) = 0;

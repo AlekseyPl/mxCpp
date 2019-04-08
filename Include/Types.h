@@ -4,6 +4,21 @@
 #include <stdint.h>
 #include <vector>
 #include <float.h>
+#include <memory>
+
+enum MexInParamsIdx {
+	L_idx		= 0,
+	M_idx		= 1,
+	N_idx		= 2,
+	Nt_idx		= 3,
+	Nsymb_idx   = 4,
+	Var_idx     = 5, // not used in Viterbi // ONLY FOR BCJR
+	Spectrs_idx = 6,
+	RefSigs_idx = 7,
+	InLLR_idx   = 8, // not used in Viterbi // ONLY FOR BCJR
+	TBLen_idx   = 9
+};
+
 
 enum class DataType {
 	real = 0,
@@ -24,8 +39,6 @@ struct SignalParams
 	int L; // Длительность импульса в тактовых интервалах
 	int Nt;// Количество отсчетов на ТИ
 	int N; // Количество модуляционных символов
-
-
 
 	int log2M;
 	int ML;   // M^L
@@ -62,14 +75,14 @@ const double MInf = -DBL_MAX;
 const double MInf = DBL_MAX;
 #endif
 
-typedef std::vector< ValueState > 		StVector;
-typedef std::vector< StVector > 		StMatrix;
+using StVector = std::vector< ValueState >;
+using StMatrix = std::vector< StVector >;
 
-typedef std::vector< double > 			DVector;
-typedef	std::vector< DVector > 			DMatrix;
+using DVector = std::vector< double >;
+using DMatrix =	std::vector< DVector >;
 
-typedef std::vector< int >				IVector;
-typedef std::vector< IVector >			IMatrix;
+using IVector = std::vector< int >;
+using IMatrix = std::vector< IVector >;
 
 
 #endif
